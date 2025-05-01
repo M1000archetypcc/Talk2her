@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PGP Secure Chat</title>
+  <title>Talk2Her - Chat PGP 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #121212;
-      color: #f0f0f0;
+      font-family: 'Comfortaa', cursive;
+      background: linear-gradient(135deg, #ffc0cb, #e0bbff);
+      color: #333;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      animation: fadeScreen 1.2s ease-in-out;
+      overflow: hidden;
+      position: relative;
     }
     header {
-      background-color: #1f1f1f;
+      background: #ff6ec7;
       padding: 1rem;
       text-align: center;
-      font-size: 1.5rem;
-      color: #00d8ff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      letter-spacing: 1px;
     }
     .chat {
       flex: 1;
@@ -29,99 +33,127 @@
       padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
-      animation: fadeIn 0.5s ease-in-out;
+      gap: 1rem;
     }
     .message {
-      padding: 0.8rem 1.2rem;
-      border-radius: 16px;
+      padding: 1rem;
+      border-radius: 20px;
       max-width: 60%;
       word-wrap: break-word;
-      animation: popIn 0.3s ease;
+      position: relative;
+      animation: fadeIn 0.4s ease;
     }
     .sent {
-      background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+      background: #ffd1dc;
       align-self: flex-end;
     }
     .received {
-      background: linear-gradient(135deg, #424242, #616161);
+      background: #f3e5f5;
       align-self: flex-start;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .input-area {
       display: flex;
+      flex-direction: column;
       gap: 0.5rem;
       padding: 1rem;
-      background-color: #1f1f1f;
+      background: #ffeff7;
     }
-    .input-area input {
-      flex: 1;
-      padding: 0.6rem 1rem;
-      border-radius: 10px;
+    .input-area textarea, .input-area input {
+      padding: 0.8rem;
+      border-radius: 12px;
       border: none;
       font-size: 1rem;
-      background: #2c2c2c;
-      color: #fff;
+      background: white;
+      color: #333;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .input-area button {
-      padding: 0.6rem 1.2rem;
+      padding: 0.8rem 1.2rem;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-weight: bold;
+      background: #ff6ec7;
+      color: white;
       cursor: pointer;
-      background: #00d8ff;
-      color: #000;
-      transition: transform 0.2s ease, background 0.3s ease;
+      transition: background 0.3s ease;
     }
     .input-area button:hover {
-      transform: scale(1.05);
-      background: #00b8d4;
+      background: #ff4bb2;
     }
-    #copyKeyBtn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: #2c2c2c;
-      color: #00d8ff;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      cursor: pointer;
+    #keySetup {
+      padding: 1rem;
+      background: #fff0fa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     #notification {
       position: fixed;
       bottom: 90px;
       left: 50%;
       transform: translateX(-50%);
-      background: #333;
+      background: #ff6ec7;
       padding: 0.7rem 1.2rem;
       border-radius: 10px;
+      color: white;
       opacity: 0;
       transition: opacity 0.3s ease;
-      color: #00d8ff;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .hearts {
+      position: fixed;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: -1;
     }
-    @keyframes fadeScreen {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .hearts span {
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 20px;
+      background: url('https://emoji.discourse-cdn.com/twitter/heart.png') no-repeat center center / contain;
+      animation: floatHearts 8s infinite;
     }
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+    @keyframes floatHearts {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <header>PGP Secure Chat</header>
-  <button id="copyKeyBtn">Copier ma clé publique</button>
-  <div class="chat" id="chat"></div>
-  <div class="input-area">
-    <input type="text" id="messageInput" placeholder="Tape ton message...">
-    <button onclick="sendMessage()">Envoyer</button>
+  <header>Talk2Her 💖</header>
+
+  <div id="keySetup">
+    <label for="privateKey">💎 Ta clé privée PGP :</label>
+    <textarea id="privateKey" rows="4" placeholder="Colle ta clé PRIVÉE ici..."></textarea>
+    <input type="password" id="passphrase" placeholder="🔐 Mot de passe de ta clé privée">
+
+    <label for="publicKey">🌸 Clé publique de ta copine :</label>
+    <textarea id="publicKey" rows="4" placeholder="Colle sa clé PUBLIQUE ici..."></textarea>
+    <button onclick="initializeKeys()">✨ Valider les clés</button>
   </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="input-area">
+    <input type="text" id="messageInput" placeholder="💌 Écris-lui un petit mot...">
+    <button onclick="sendMessage()">Envoyer 💖</button>
+  </div>
+
   <div id="notification">💬 Nouveau message reçu !</div>
+  <div class="hearts">
+    <span style="left: 20%; animation-delay: 0s;"></span>
+    <span style="left: 50%; animation-delay: 2s;"></span>
+    <span style="left: 80%; animation-delay: 4s;"></span>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/openpgp@5.10.0/dist/openpgp.min.js"></script>
   <script type="module">
@@ -140,56 +172,32 @@
     const db = getDatabase(app);
     const messagesRef = ref(db, 'messages');
 
-    let myPublicKeyArmored, myPrivateKey, myPassphrase = '1234';
-    let contactPublicKey = null;
+    let myPrivateKey, contactPublicKey;
 
     const chatEl = document.getElementById('chat');
     const notification = document.getElementById('notification');
 
-    (async () => {
-      const { privateKey, publicKey } = await openpgp.generateKey({
-        type: 'ecc', curve: 'curve25519',
-        userIDs: [{ name: 'User', email: 'user@chat.com' }],
-        passphrase: myPassphrase
-      });
-      myPublicKeyArmored = publicKey;
-      const decryptedKey = await openpgp.decryptKey({
-        privateKey: await openpgp.readPrivateKey({ armoredKey: privateKey }),
-        passphrase: myPassphrase
-      });
-      myPrivateKey = decryptedKey;
+    async function initializeKeys() {
+      const privateKeyText = document.getElementById('privateKey').value;
+      const passphrase = document.getElementById('passphrase').value;
+      const publicKeyText = document.getElementById('publicKey').value;
 
-      document.getElementById('copyKeyBtn').onclick = () => {
-        navigator.clipboard.writeText(myPublicKeyArmored).then(() => {
-          alert("Clé publique copiée dans le presse-papiers !");
-        });
-      };
+      if (!privateKeyText || !passphrase || !publicKeyText) {
+        alert("Merci de remplir les 3 champs pour continuer.");
+        return;
+      }
 
-      const pubkey = prompt("Colle ici la CLÉ PUBLIQUE de la personne avec qui tu veux parler :");
-      if (pubkey) contactPublicKey = await openpgp.readKey({ armoredKey: pubkey });
+      const privKey = await openpgp.readPrivateKey({ armoredKey: privateKeyText });
+      myPrivateKey = await openpgp.decryptKey({ privateKey: privKey, passphrase });
+      contactPublicKey = await openpgp.readKey({ armoredKey: publicKeyText });
 
-      onChildAdded(messagesRef, async (snapshot) => {
-        const msgData = snapshot.val();
-        if (msgData.to === myPublicKeyArmored) {
-          try {
-            const message = await openpgp.readMessage({ armoredMessage: msgData.message });
-            const { data: decrypted } = await openpgp.decrypt({
-              message,
-              decryptionKeys: myPrivateKey
-            });
-            showMessage(decrypted, 'received');
-            showNotification();
-          } catch (e) {
-            console.log("Erreur de déchiffrement ou message non destiné à vous.");
-          }
-        }
-      });
-    })();
+      document.getElementById('keySetup').style.display = 'none';
+    }
 
     async function sendMessage() {
       const input = document.getElementById('messageInput');
       const text = input.value;
-      if (!contactPublicKey) return alert("Clé publique du contact manquante !");
+      if (!contactPublicKey) return alert("Clé publique manquante !");
 
       const encrypted = await openpgp.encrypt({
         message: await openpgp.createMessage({ text }),
@@ -197,13 +205,25 @@
       });
 
       await push(messagesRef, {
-        to: contactPublicKey.armor(),
         message: encrypted
       });
 
       showMessage(text, 'sent');
       input.value = '';
     }
+
+    onChildAdded(messagesRef, async (snapshot) => {
+      const msgData = snapshot.val();
+      if (!myPrivateKey) return;
+      try {
+        const message = await openpgp.readMessage({ armoredMessage: msgData.message });
+        const { data: decrypted } = await openpgp.decrypt({ message, decryptionKeys: myPrivateKey });
+        showMessage(decrypted, 'received');
+        showNotification();
+      } catch (e) {
+        console.log("Message reçu mais pas pour toi ou erreur de déchiffrement.");
+      }
+    });
 
     function showMessage(text, type) {
       const msg = document.createElement('div');
