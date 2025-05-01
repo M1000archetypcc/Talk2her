@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PGP Secure Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      animation: fadeScreen 1.2s ease-in-out;
+    }
+    header {
+      background-color: #1f1f1f;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      color: #00d8ff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+    .chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .message {
+      padding: 0.8rem 1.2rem;
+      border-radius: 16px;
+      max-width: 60%;
+      word-wrap: break-word;
+      animation: popIn 0.3s ease;
+    }
+    .sent {
+      background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+      align-self: flex-end;
+    }
+    .received {
+      background: linear-gradient(135deg, #424242, #616161);
+      align-self: flex-start;
+    }
+    .input-area {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      background-color: #1f1f1f;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      background: #2c2c2c;
+      color: #fff;
+    }
+    .input-area button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #00d8ff;
+      color: #000;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+    .input-area button:hover {
+      transform: scale(1.05);
+      background: #00b8d4;
+    }
+    #copyKeyBtn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #2c2c2c;
+      color: #00d8ff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    #notification {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      padding: 0.7rem 1.2rem;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      color: #00d8ff;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeScreen {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <header>PGP Secure Chat</header>
+  <button id="copyKeyBtn">Copier ma clé publique</button>
+  <div class="chat" id="chat"></div>
+  <div class="input-area">
+    <input type="text" id="messageInput" placeholder="Tape ton message...">
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
+  <div id="notification">💬 Nouveau message reçu !</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/openpgp@5.10.0/dist/openpgp.min.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getDatabase, ref, push, onChildAdded } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_test-key",
+      authDomain: "pgpchat-test.firebaseapp.com",
+      databaseURL: "https://pgpchat-test-default-rtdb.firebaseio.com",
+      projectId: "pgpchat-test",
+      appId: "1:1234567890:web:abcdefg1234567"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, 'messages');
+
+    let myPublicKeyArmored, myPrivateKey, myPassphrase = '1234';
+    let contactPublicKey = null;
+
+    const chatEl = document.getElementById('chat');
+    const notification = document.getElementById('notification');
+
+    (async () => {
+      const { privateKey, publicKey } = await openpgp.generateKey({
+        type: 'ecc', curve: 'curve25519',
+        userIDs: [{ name: 'User', email: 'user@chat.com' }],
+        passphrase: myPassphrase
+      });
+      myPublicKeyArmored = publicKey;
+      const decryptedKey = await openpgp.decryptKey({
+        privateKey: await openpgp.readPrivateKey({ armoredKey: privateKey }),
+        passphrase: myPassphrase
+      });
+      myPrivateKey = decryptedKey;
+
+      document.getElementById('copyKeyBtn').onclick = () => {
+        navigator.clipboard.writeText(myPublicKeyArmored).then(() => {
+          alert("Clé publique copiée dans le presse-papiers !");
+        });
+      };
+
+      const pubkey = prompt("Colle ici la CLÉ PUBLIQUE de la personne avec qui tu veux parler :");
+      if (pubkey) contactPublicKey = await openpgp.readKey({ armoredKey: pubkey });
+
+      onChildAdded(messagesRef, async (snapshot) => {
+        const msgData = snapshot.val();
+        if (msgData.to === myPublicKeyArmored) {
+          try {
+            const message = await openpgp.readMessage({ armoredMessage: msgData.message });
+            const { data: decrypted } = await openpgp.decrypt({
+              message,
+              decryptionKeys: myPrivateKey
+            });
+            showMessage(decrypted, 'received');
+            showNotification();
+          } catch (e) {
+            console.log("Erreur de déchiffrement ou message non destiné à vous.");
+          }
+        }
+      });
+    })();
+
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value;
+      if (!contactPublicKey) return alert("Clé publique du contact manquante !");
+
+      const encrypted = await openpgp.encrypt({
+        message: await openpgp.createMessage({ text }),
+        encryptionKeys: contactPublicKey
+      });
+
+      await push(messagesRef, {
+        to: contactPublicKey.armor(),
+        message: encrypted
+      });
+
+      showMessage(text, 'sent');
+      input.value = '';
+    }
+
+    function showMessage(text, type) {
+      const msg = document.createElement('div');
+      msg.className = `message ${type}`;
+      msg.textContent = text;
+      chatEl.appendChild(msg);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function showNotification() {
+      notification.style.opacity = '1';
+      setTimeout(() => notification.style.opacity = '0', 3000);
+    }
+  </script>
+</body>
+</html>
