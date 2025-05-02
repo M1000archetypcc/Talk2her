@@ -3,29 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Talk2Her - Chat PGP 💖</title>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+  <title>Talk2Her - Chat PGP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Comfortaa', cursive;
-      background: linear-gradient(135deg, #ffc0cb, #e0bbff);
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fa;
       color: #333;
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
-      position: relative;
     }
     header {
-      background: #ff6ec7;
+      background: #007AFF;
       padding: 1rem;
       text-align: center;
-      font-size: 2rem;
-      font-weight: bold;
+      font-size: 1.5rem;
+      font-weight: 600;
       color: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      letter-spacing: 1px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .chat {
       flex: 1;
@@ -33,127 +31,107 @@
       padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
     }
     .message {
-      padding: 1rem;
-      border-radius: 20px;
-      max-width: 60%;
+      padding: 0.8rem 1rem;
+      border-radius: 16px;
+      max-width: 70%;
       word-wrap: break-word;
       position: relative;
-      animation: fadeIn 0.4s ease;
+      font-size: 0.95rem;
+      line-height: 1.4;
     }
     .sent {
-      background: #ffd1dc;
+      background: #dcf8c6;
       align-self: flex-end;
     }
     .received {
-      background: #f3e5f5;
+      background: #ffffff;
       align-self: flex-start;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      border: 1px solid #e0e0e0;
     }
     .input-area {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: #ffeff7;
-    }
-    .input-area textarea, .input-area input {
+      align-items: center;
       padding: 0.8rem;
-      border-radius: 12px;
-      border: none;
+      border-top: 1px solid #e0e0e0;
+      background: #fff;
+      gap: 0.5rem;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      border: 1px solid #ccc;
       font-size: 1rem;
-      background: white;
-      color: #333;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .input-area button {
-      padding: 0.8rem 1.2rem;
+      padding: 0.6rem 1rem;
       border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      background: #ff6ec7;
+      border-radius: 20px;
+      font-weight: 600;
+      background: #007AFF;
       color: white;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.3s;
     }
     .input-area button:hover {
-      background: #ff4bb2;
+      background: #005FCC;
     }
     #keySetup {
       padding: 1rem;
-      background: #fff0fa;
+      background: #fff;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.8rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    #keySetup textarea, #keySetup input {
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      font-family: monospace;
     }
     #notification {
       position: fixed;
-      bottom: 90px;
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: #ff6ec7;
-      padding: 0.7rem 1.2rem;
-      border-radius: 10px;
+      background: #007AFF;
       color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
       opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .hearts {
-      position: fixed;
-      pointer-events: none;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      overflow: hidden;
-      z-index: -1;
-    }
-    .hearts span {
-      position: absolute;
-      display: block;
-      width: 20px;
-      height: 20px;
-      background: url('https://emoji.discourse-cdn.com/twitter/heart.png') no-repeat center center / contain;
-      animation: floatHearts 8s infinite;
-    }
-    @keyframes floatHearts {
-      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+      transition: opacity 0.4s;
     }
   </style>
 </head>
 <body>
-  <header>Talk2Her 💖</header>
+  <header>Talk2Her 🔐</header>
 
   <div id="keySetup">
-    <label for="privateKey">💎 Ta clé privée PGP :</label>
-    <textarea id="privateKey" rows="4" placeholder="Colle ta clé PRIVÉE ici..."></textarea>
-    <input type="password" id="passphrase" placeholder="🔐 Mot de passe de ta clé privée">
+    <label for="privateKey">Ta clé privée PGP :</label>
+    <textarea id="privateKey" rows="4" placeholder="Colle ici ta clé privée"></textarea>
 
-    <label for="publicKey">🌸 Clé publique de ta copine :</label>
-    <textarea id="publicKey" rows="4" placeholder="Colle sa clé PUBLIQUE ici..."></textarea>
-    <button onclick="initializeKeys()">✨ Valider les clés</button>
+    <label for="passphrase">Mot de passe :</label>
+    <input type="password" id="passphrase" placeholder="Mot de passe de ta clé privée">
+
+    <label for="publicKey">Clé publique de ton contact :</label>
+    <textarea id="publicKey" rows="4" placeholder="Colle ici la clé publique de ton contact"></textarea>
+
+    <button id="validateBtn">Valider les clés 🔑</button>
   </div>
 
   <div class="chat" id="chat"></div>
 
   <div class="input-area">
-    <input type="text" id="messageInput" placeholder="💌 Écris-lui un petit mot...">
-    <button onclick="sendMessage()">Envoyer 💖</button>
+    <input type="text" id="messageInput" placeholder="Tape ton message...">
+    <button id="sendBtn">Envoyer</button>
   </div>
 
-  <div id="notification">💬 Nouveau message reçu !</div>
-  <div class="hearts">
-    <span style="left: 20%; animation-delay: 0s;"></span>
-    <span style="left: 50%; animation-delay: 2s;"></span>
-    <span style="left: 80%; animation-delay: 4s;"></span>
-  </div>
+  <div id="notification">📩 Nouveau message reçu !</div>
 
   <script src="https://cdn.jsdelivr.net/npm/openpgp@5.10.0/dist/openpgp.min.js"></script>
   <script type="module">
@@ -162,13 +140,10 @@
 
     const firebaseConfig = {
       apiKey: "AIzaSyAokNWPk_e4igAC4--U9rbhtFy_qcTS8mw",
-      authDomain: "talk2her-a8fa9.firebaseapp.com",
-      databaseURL: "https://talk2her-a8fa9-default-rtdb.firebaseio.com/",
-      projectId: "talk2her-a8fa9",
-      storageBucket: "talk2her-a8fa9.appspot.com",
-      messagingSenderId: "834946568833",
-      appId: "1:834946568833:web:3d42f90fd550d68acbf380",
-      measurementId: "G-QHR1BBS50L"
+      authDomain: "pgpchat-test.firebaseapp.com",
+      databaseURL: "https://pgpchat-test-default-rtdb.firebaseio.com",
+      projectId: "pgpchat-test",
+      appId: "1:1234567890:web:abcdefg1234567"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -186,31 +161,31 @@
       const publicKeyText = document.getElementById('publicKey').value;
 
       if (!privateKeyText || !passphrase || !publicKeyText) {
-        alert("Merci de remplir les 3 champs pour continuer.");
+        alert("Merci de remplir tous les champs.");
         return;
       }
 
-      const privKey = await openpgp.readPrivateKey({ armoredKey: privateKeyText });
-      myPrivateKey = await openpgp.decryptKey({ privateKey: privKey, passphrase });
-      contactPublicKey = await openpgp.readKey({ armoredKey: publicKeyText });
-
-      document.getElementById('keySetup').style.display = 'none';
+      try {
+        const privKey = await openpgp.readPrivateKey({ armoredKey: privateKeyText });
+        myPrivateKey = await openpgp.decryptKey({ privateKey: privKey, passphrase });
+        contactPublicKey = await openpgp.readKey({ armoredKey: publicKeyText });
+        document.getElementById('keySetup').style.display = 'none';
+      } catch (error) {
+        alert("Erreur dans les clés ou le mot de passe.");
+      }
     }
 
     async function sendMessage() {
       const input = document.getElementById('messageInput');
-      const text = input.value;
-      if (!contactPublicKey) return alert("Clé publique manquante !");
+      const text = input.value.trim();
+      if (!text || !contactPublicKey) return;
 
       const encrypted = await openpgp.encrypt({
         message: await openpgp.createMessage({ text }),
         encryptionKeys: contactPublicKey
       });
 
-      await push(messagesRef, {
-        message: encrypted
-      });
-
+      await push(messagesRef, { message: encrypted });
       showMessage(text, 'sent');
       input.value = '';
     }
@@ -218,13 +193,14 @@
     onChildAdded(messagesRef, async (snapshot) => {
       const msgData = snapshot.val();
       if (!myPrivateKey) return;
+
       try {
         const message = await openpgp.readMessage({ armoredMessage: msgData.message });
         const { data: decrypted } = await openpgp.decrypt({ message, decryptionKeys: myPrivateKey });
         showMessage(decrypted, 'received');
         showNotification();
       } catch (e) {
-        console.log("Message reçu mais pas pour toi ou erreur de déchiffrement.");
+        console.log("Message non lisible : mauvaise clé ou format.");
       }
     });
 
@@ -238,10 +214,11 @@
 
     function showNotification() {
       notification.style.opacity = '1';
-      setTimeout(() => notification.style.opacity = '0', 3000);
+      setTimeout(() => notification.style.opacity = '0', 2500);
     }
-    window.initializeKeys = initializeKeys;
-    window.sendMessage = sendMessage;
+
+    document.getElementById('validateBtn').addEventListener('click', initializeKeys);
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
   </script>
 </body>
 </html>
